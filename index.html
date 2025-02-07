@@ -338,7 +338,7 @@
                         name.textContent = cell;
                         
                         if (colIndex === 0 && rowIndex > 0) {
-                            name.className = 'font-bold text-white';
+                            name.className = 'font-bold text-white text-center w-full';
                         } else {
                             name.className = 'font-medium';
                         }
@@ -349,8 +349,9 @@
                         
                         if (rowIndex === 0) {
                             classes += ' score-cell text-white font-bold flex items-center justify-center h-full p-0';
+                            name.className = 'font-bold text-white text-center w-full';
                         } else if (colIndex === 0) {
-                            classes += ' score-cell text-white font-bold';
+                            classes += ' score-cell text-white font-bold h-full flex items-center justify-center p-0';
                         } else if (rowIndex > 0 && colIndex > 0) {
                             const rowProb = quarterProbabilities[currentQuarter][row[0]];
                             const colProb = quarterProbabilities[currentQuarter][gridData[0][colIndex]];
