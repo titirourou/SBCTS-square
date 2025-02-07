@@ -333,24 +333,26 @@
             // Find the maximum probability for the current quarter
             const currentQuarterProbs = quarterProbabilities[quarter];
             let maxQuarterProb = 0;
+            let totalQuarterProb = 0;
             
-            // Calculate the actual maximum probability for this quarter
+            // Calculate total probability for normalization
             for (let digit1 in currentQuarterProbs) {
                 for (let digit2 in currentQuarterProbs) {
-                    const combinedProb = (currentQuarterProbs[digit1] * currentQuarterProbs[digit2]) / 100;
-                    maxQuarterProb = Math.max(maxQuarterProb, combinedProb);
+                    const rawProb = (currentQuarterProbs[digit1] * currentQuarterProbs[digit2]) / 100;
+                    totalQuarterProb += rawProb;
+                    maxQuarterProb = Math.max(maxQuarterProb, rawProb);
                 }
             }
             
-            // Normalize the probability relative to this quarter's maximum
-            const normalizedProb = (probability / maxQuarterProb) * 100;
+            // Normalize the probability
+            const normalizedProb = (probability / totalQuarterProb) * 100;
             
-            if (normalizedProb > 85) return 'bg-prob7';
-            if (normalizedProb > 70) return 'bg-prob6';
-            if (normalizedProb > 55) return 'bg-prob5';
-            if (normalizedProb > 40) return 'bg-prob4';
-            if (normalizedProb > 25) return 'bg-prob3';
-            if (normalizedProb > 10) return 'bg-prob2';
+            if (normalizedProb > 8.5) return 'bg-prob7';
+            if (normalizedProb > 7) return 'bg-prob6';
+            if (normalizedProb > 5.5) return 'bg-prob5';
+            if (normalizedProb > 4) return 'bg-prob4';
+            if (normalizedProb > 2.5) return 'bg-prob3';
+            if (normalizedProb > 1) return 'bg-prob2';
             return 'bg-prob1';
         }
 
@@ -397,6 +399,18 @@
             const grid = document.getElementById('squares-grid');
             grid.innerHTML = '';
 
+            // Calculate normalization factors for each quarter
+            const normalizationFactors = {};
+            for (let quarter = 1; quarter <= 4; quarter++) {
+                let totalProb = 0;
+                for (let digit1 in quarterProbabilities[quarter]) {
+                    for (let digit2 in quarterProbabilities[quarter]) {
+                        totalProb += (quarterProbabilities[quarter][digit1] * quarterProbabilities[quarter][digit2]) / 100;
+                    }
+                }
+                normalizationFactors[quarter] = 100 / totalProb;
+            }
+
             gridData.forEach((row, rowIndex) => {
                 row.forEach((cell, colIndex) => {
                     const div = document.createElement('div');
@@ -436,9 +450,11 @@
                         } else if (rowIndex > 0 && colIndex > 0) {
                             const rowProb = quarterProbabilities[currentQuarter][row[0]];
                             const colProb = quarterProbabilities[currentQuarter][gridData[0][colIndex]];
-                            const combinedProb = (rowProb * colProb) / 100;
+                            const rawProb = (rowProb * colProb) / 100;
+                            // Normalize the probability
+                            const normalizedProb = rawProb * normalizationFactors[currentQuarter];
                             
-                            const bgColorClass = getBackgroundColor(combinedProb, currentQuarter);
+                            const bgColorClass = getBackgroundColor(normalizedProb, currentQuarter);
                             classes += ' ' + bgColorClass;
                             
                             const textColorClass = getTextColor(bgColorClass);
@@ -446,7 +462,7 @@
                             
                             const probDiv = document.createElement('div');
                             probDiv.className = `text-xs ${textColorClass} mt-1 font-medium`;
-                            probDiv.textContent = `${combinedProb.toFixed(1)}%`;
+                            probDiv.textContent = `${normalizedProb.toFixed(1)}%`;
                             div.appendChild(probDiv);
 
                             if (selectedName && cell !== selectedName) {
@@ -489,6 +505,18 @@
                 }
             });
 
+            // Calculate normalization factors for each quarter
+            const normalizationFactors = {};
+            for (let quarter = 1; quarter <= 4; quarter++) {
+                let totalProb = 0;
+                for (let digit1 in quarterProbabilities[quarter]) {
+                    for (let digit2 in quarterProbabilities[quarter]) {
+                        totalProb += (quarterProbabilities[quarter][digit1] * quarterProbabilities[quarter][digit2]) / 100;
+                    }
+                }
+                normalizationFactors[quarter] = 100 / totalProb;
+            }
+
             // Calculate probabilities for each player
             for (let player in players) {
                 // Calculate probability for each quarter
@@ -500,11 +528,13 @@
                     players[player].squares.forEach(square => {
                         const chiefsProb = quarterProbabilities[quarter][square.chiefs];
                         const eaglesProb = quarterProbabilities[quarter][square.eagles];
-                        const squareProb = (chiefsProb * eaglesProb) / 100;
-                        quarterProb += squareProb;
+                        const rawProb = (chiefsProb * eaglesProb) / 100;
+                        // Normalize the probability
+                        const normalizedProb = rawProb * normalizationFactors[quarter];
+                        quarterProb += normalizedProb;
                         
-                        if (squareProb > bestProb) {
-                            bestProb = squareProb;
+                        if (normalizedProb > bestProb) {
+                            bestProb = normalizedProb;
                             bestSquare = square;
                         }
                     });
