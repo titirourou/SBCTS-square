@@ -68,41 +68,34 @@
                 display: none;
             }
             body {
-                padding-bottom: 7rem;
-                background: white;
                 padding: 0;
+                background: white;
+                overflow-x: hidden;
             }
             .max-w-7xl {
                 padding: 0 !important;
+                margin: 0 !important;
+                width: 100%;
             }
             .bg-white.rounded-xl {
                 padding: 0 !important;
                 border-radius: 0;
                 box-shadow: none;
+                width: 100%;
             }
             #squares-grid {
                 font-size: 0.65rem;
                 min-width: unset !important;
-                width: 100vw !important;
-                margin-left: calc(-50vw + 50%);
-                margin-right: calc(-50vw + 50%);
-                position: relative;
-                left: 50%;
-                right: 50%;
+                width: 100% !important;
+                margin: 0;
                 border-radius: 0;
-                border-left: 0;
-                border-right: 0;
+                border: none;
             }
             .squares-wrapper {
                 padding: 0;
                 margin: 0;
-                overflow-x: hidden;
-                width: 100vw;
-                margin-left: calc(-50vw + 50%);
-                margin-right: calc(-50vw + 50%);
-                position: relative;
-                left: 50%;
-                right: 50%;
+                overflow: hidden;
+                width: 100%;
             }
             .bg-white {
                 padding: 0 !important;
@@ -119,15 +112,6 @@
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
-            }
-            #squares-grid .font-medium {
-                font-size: 0.6rem;
-                line-height: 1;
-            }
-            #squares-grid .text-xs {
-                font-size: 0.5rem;
-                line-height: 1;
-                margin-top: 0.1rem;
             }
             .analysis-wrapper {
                 margin: 1.5rem 0.75rem 7rem 0.75rem !important;
@@ -170,13 +154,9 @@
             .squares-wrapper {
                 width: 100%;
             }
-            .mobile-controls {
-                padding: 0.75rem 0.75rem 1.5rem 0.75rem;
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(8px);
-            }
             body {
                 padding: 0;
+                overflow-x: hidden;
             }
             .analysis-wrapper {
                 margin: 1rem 0.5rem 7rem 0.5rem !important;
