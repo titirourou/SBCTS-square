@@ -81,7 +81,7 @@
                 box-shadow: none;
             }
             #squares-grid {
-                font-size: 0.75rem;
+                font-size: 0.65rem;
                 min-width: unset !important;
                 width: 100vw !important;
                 margin-left: calc(-50vw + 50%);
@@ -112,7 +112,7 @@
             #squares-grid .aspect-square {
                 aspect-ratio: 1/1;
                 min-height: unset;
-                padding: 0.25rem;
+                padding: 0.15rem;
                 width: 100%;
                 height: 100%;
                 display: flex;
@@ -120,13 +120,26 @@
                 justify-content: center;
                 align-items: center;
             }
+            #squares-grid .font-medium {
+                font-size: 0.6rem;
+                line-height: 1;
+            }
+            #squares-grid .text-xs {
+                font-size: 0.5rem;
+                line-height: 1;
+                margin-top: 0.1rem;
+            }
             .analysis-wrapper {
-                margin: 1rem !important;
+                margin: 1.5rem 0.75rem 7rem 0.75rem !important;
                 padding: 1rem !important;
                 border-radius: 0.5rem;
             }
             .analysis-wrapper table {
-                margin: 0 !important;
+                font-size: 0.7rem;
+            }
+            .analysis-wrapper th,
+            .analysis-wrapper td {
+                padding: 0.5rem 0.25rem;
             }
             #nameFilter-mobile {
                 padding: 1rem !important;
@@ -146,8 +159,13 @@
         }
         @media (max-width: 640px) {
             #squares-grid {
-                font-size: 0.65rem;
-                width: 100% !important;
+                font-size: 0.6rem;
+            }
+            #squares-grid .font-medium {
+                font-size: 0.55rem;
+            }
+            #squares-grid .text-xs {
+                font-size: 0.45rem;
             }
             .squares-wrapper {
                 width: 100%;
@@ -161,8 +179,15 @@
                 padding: 0;
             }
             .analysis-wrapper {
-                margin: 0.5rem 0 7rem 0 !important;
+                margin: 1rem 0.5rem 7rem 0.5rem !important;
                 padding: 0.75rem !important;
+            }
+            .analysis-wrapper table {
+                font-size: 0.65rem;
+            }
+            .analysis-wrapper th,
+            .analysis-wrapper td {
+                padding: 0.4rem 0.2rem;
             }
             .bg-white {
                 padding: 0 !important;
