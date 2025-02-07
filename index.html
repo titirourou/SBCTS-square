@@ -74,18 +74,18 @@
             #squares-grid {
                 font-size: 0.75rem;
                 min-width: unset !important;
-                width: 100vw !important;
-                margin-left: -1rem;
-                margin-right: -1rem;
+                width: calc(100vw - 2rem) !important;
+                margin-left: 0;
+                margin-right: 0;
             }
             .squares-wrapper {
                 padding: 0;
-                margin: 0 -1rem;
+                margin: 0;
                 overflow-x: hidden;
-                width: calc(100% + 2rem);
+                width: 100%;
             }
             .bg-white {
-                padding: 0.75rem 1rem !important;
+                padding: 0.75rem !important;
                 background: white;
             }
             #squares-grid .aspect-square {
@@ -121,25 +121,22 @@
                 width: 100% !important;
                 text-align: center !important;
             }
+            #nameFilter-mobile {
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
+                font-size: 1rem !important;
+            }
         }
         @media (max-width: 640px) {
             #squares-grid {
                 font-size: 0.65rem;
-                margin-left: -0.75rem;
-                margin-right: -0.75rem;
+                width: calc(100vw - 1.5rem) !important;
             }
             .squares-wrapper {
-                margin: 0 -0.75rem;
-                width: calc(100% + 1.5rem);
-            }
-            #squares-grid .font-medium {
-                font-size: 0.6rem;
-            }
-            #squares-grid .text-xs {
-                font-size: 0.5rem;
+                width: 100%;
             }
             .mobile-controls {
-                padding: 0.5rem;
+                padding: 0.75rem;
                 background: rgba(255, 255, 255, 0.95);
                 backdrop-filter: blur(8px);
             }
