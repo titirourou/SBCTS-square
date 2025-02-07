@@ -399,16 +399,12 @@
             const grid = document.getElementById('squares-grid');
             grid.innerHTML = '';
 
-            // Calculate normalization factors for each quarter
-            const normalizationFactors = {};
-            for (let quarter = 1; quarter <= 4; quarter++) {
-                let totalProb = 0;
-                for (let digit1 in quarterProbabilities[quarter]) {
-                    for (let digit2 in quarterProbabilities[quarter]) {
-                        totalProb += (quarterProbabilities[quarter][digit1] * quarterProbabilities[quarter][digit2]) / 100;
-                    }
+            // Calculate total probability for current quarter
+            let totalQuarterProb = 0;
+            for (let digit1 in quarterProbabilities[currentQuarter]) {
+                for (let digit2 in quarterProbabilities[currentQuarter]) {
+                    totalQuarterProb += (quarterProbabilities[currentQuarter][digit1] * quarterProbabilities[currentQuarter][digit2]) / 100;
                 }
-                normalizationFactors[quarter] = 100 / totalProb;
             }
 
             gridData.forEach((row, rowIndex) => {
@@ -451,8 +447,7 @@
                             const rowProb = quarterProbabilities[currentQuarter][row[0]];
                             const colProb = quarterProbabilities[currentQuarter][gridData[0][colIndex]];
                             const rawProb = (rowProb * colProb) / 100;
-                            // Normalize the probability
-                            const normalizedProb = rawProb * normalizationFactors[currentQuarter];
+                            const normalizedProb = (rawProb / totalQuarterProb) * 100;
                             
                             const bgColorClass = getBackgroundColor(normalizedProb, currentQuarter);
                             classes += ' ' + bgColorClass;
@@ -513,16 +508,6 @@
                     let bestProb = 0;
                     let bestSquare = null;
                     
-                    // First calculate raw probabilities for all squares
-                    const squareProbs = players[player].squares.map(square => {
-                        const chiefsProb = quarterProbabilities[quarter][square.chiefs];
-                        const eaglesProb = quarterProbabilities[quarter][square.eagles];
-                        return {
-                            square: square,
-                            prob: (chiefsProb * eaglesProb) / 100
-                        };
-                    });
-                    
                     // Calculate total probability for this quarter across all squares
                     let totalQuarterProb = 0;
                     for (let digit1 in quarterProbabilities[quarter]) {
@@ -531,9 +516,12 @@
                         }
                     }
                     
-                    // Normalize each square's probability and sum for the player
-                    squareProbs.forEach(({ square, prob }) => {
-                        const normalizedProb = (prob / totalQuarterProb) * 100;
+                    // Calculate probabilities for each square
+                    players[player].squares.forEach(square => {
+                        const chiefsProb = quarterProbabilities[quarter][square.chiefs];
+                        const eaglesProb = quarterProbabilities[quarter][square.eagles];
+                        const rawProb = (chiefsProb * eaglesProb) / 100;
+                        const normalizedProb = (rawProb / totalQuarterProb) * 100;
                         quarterProb += normalizedProb;
                         
                         if (normalizedProb > bestProb) {
