@@ -14,13 +14,13 @@
                     colors: {
                         nflBlue: '#013369',
                         nflRed: '#D50A0A',
-                        prob1: '#f7fbff',  // Adjusted for better contrast
+                        prob1: '#ffffff',  // Changed to white for lowest probability
                         prob2: '#deebf7',
                         prob3: '#c6dbef',
                         prob4: '#9ecae1',
                         prob5: '#6baed6',
                         prob6: '#3182bd',
-                        prob7: '#08519c'   // Adjusted for better contrast
+                        prob7: '#08519c'   // Darkest blue for highest probability
                     }
                 }
             }
@@ -209,13 +209,60 @@
         #squares-grid {
             grid-template-columns: repeat(11, minmax(0, 1fr));
         }
+        @media (min-width: 769px) {
+            .squares-wrapper {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+            #squares-grid {
+                font-size: 0.85rem;
+            }
+            #squares-grid .aspect-square {
+                padding: 0.5rem;
+            }
+            #squares-grid .text-xs {
+                font-size: 0.75rem;
+            }
+        }
+        #squares-grid .aspect-square.ring-2 {
+            box-shadow: inset 0 0 0 2px rgba(1, 51, 105, 0.6);
+            ring-width: 0 !important;
+            ring-offset-width: 0 !important;
+        }
+        .quarter-btn.active {
+            background-color: #08519c !important;
+            font-weight: 600;
+            transform: scale(1.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body class="bg-white min-h-screen p-2 md:p-4 lg:p-8 pb-24 md:pb-8">
     <div class="max-w-7xl mx-auto">
         <div class="text-center mb-4 md:mb-8" data-aos="fade-down">
-            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-nflBlue mb-2">Super Bowl LVIII Squares</h1>
-            <p class="text-lg md:text-xl text-gray-600">Kansas City Chiefs vs Philadelphia Eagles</p>
+            <div class="flex justify-center mb-4">
+                <img src="Super_Bowl_LIX_Logo.svg.png" 
+                     alt="Super Bowl LVIII Logo" 
+                     class="h-[120px]"
+                     style="height: 120px; width: auto;">
+            </div>
+            <div class="flex justify-center items-center space-x-8 mb-6">
+                <img src="Kansas_City_Chiefs_wordmark.svg.png" 
+                     alt="Kansas City Chiefs Logo" 
+                     class="h-[40px]"
+                     style="height: 40px; width: auto;">
+                <div class="text-2xl font-bold text-nflBlue">VS</div>
+                <img src="Philadelphia_Eagles_wordmark_(2022–present).svg.png" 
+                     alt="Philadelphia Eagles Logo" 
+                     class="h-[40px]"
+                     style="height: 40px; width: auto;">
+            </div>
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-nflBlue mb-2">ChalkTalk Sports Squares</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto mb-6 text-xs md:text-sm leading-relaxed">
+                Welcome to our Super Bowl Squares Probability Dashboard! 🏈<br><br>
+                Congratulations to last year's winners Allie, Robert, Chris, and Alex. With squares randomly assigned, we've analyzed historical scoring patterns to show the probability of each square winning.<br><br>
+                Navigate through quarters to see how odds shift throughout the game (darker blue indicates higher probability). Use the name filter to highlight your squares, and explore the detailed analysis table below for a complete statistical breakdown.
+            </p>
         </div>
         
         <div class="bg-white rounded-xl shadow-lg p-3 md:p-6 lg:p-8" data-aos="fade-up">
@@ -330,36 +377,43 @@
         }
 
         function getBackgroundColor(probability, quarter) {
-            // Find the maximum probability for the current quarter
+            // Find the maximum and minimum probabilities for the current quarter
             const currentQuarterProbs = quarterProbabilities[quarter];
-            let maxQuarterProb = 0;
-            let totalQuarterProb = 0;
+            let maxProb = 0;
+            let minProb = Infinity;
+            let allProbs = [];
             
-            // Calculate total probability for normalization
+            // Calculate all probabilities for this quarter
             for (let digit1 in currentQuarterProbs) {
                 for (let digit2 in currentQuarterProbs) {
                     const rawProb = (currentQuarterProbs[digit1] * currentQuarterProbs[digit2]) / 100;
-                    totalQuarterProb += rawProb;
-                    maxQuarterProb = Math.max(maxQuarterProb, rawProb);
+                    allProbs.push(rawProb);
+                    maxProb = Math.max(maxProb, rawProb);
+                    minProb = Math.min(minProb, rawProb);
                 }
             }
             
-            // Normalize the probability
-            const normalizedProb = (probability / totalQuarterProb) * 100;
+            // Calculate where this probability falls in the range from min to max
+            const range = maxProb - minProb;
+            const normalizedValue = (probability - minProb) / range;
             
-            if (normalizedProb > 8.5) return 'bg-prob7';
-            if (normalizedProb > 7) return 'bg-prob6';
-            if (normalizedProb > 5.5) return 'bg-prob5';
-            if (normalizedProb > 4) return 'bg-prob4';
-            if (normalizedProb > 2.5) return 'bg-prob3';
-            if (normalizedProb > 1) return 'bg-prob2';
-            return 'bg-prob1';
+            // Use a more exponential scale to emphasize the differences
+            const scaledValue = Math.pow(normalizedValue, 0.7); // This makes the scale slightly more linear
+            
+            // Assign colors based on the scaled value
+            if (scaledValue >= 0.85) return 'bg-prob7';      // Darkest blue for top 15%
+            if (scaledValue >= 0.70) return 'bg-prob6';
+            if (scaledValue >= 0.55) return 'bg-prob5';
+            if (scaledValue >= 0.40) return 'bg-prob4';
+            if (scaledValue >= 0.25) return 'bg-prob3';
+            if (scaledValue >= 0.10) return 'bg-prob2';
+            return 'bg-prob1';                               // White for bottom 10%
         }
 
         function getTextColor(bgColorClass) {
             // Map background classes to their hex colors
             const colorMap = {
-                'bg-prob1': '#f7fbff',
+                'bg-prob1': '#ffffff',  // Updated to match new white color
                 'bg-prob2': '#deebf7',
                 'bg-prob3': '#c6dbef',
                 'bg-prob4': '#9ecae1',
@@ -387,9 +441,11 @@
             // Update active state of buttons
             document.querySelectorAll('.quarter-btn').forEach(btn => {
                 if (parseInt(btn.dataset.quarter) === quarter) {
-                    btn.classList.add('active', 'bg-opacity-75');
+                    btn.classList.add('active');
+                    btn.classList.remove('hover:bg-opacity-90');
                 } else {
-                    btn.classList.remove('active', 'bg-opacity-75');
+                    btn.classList.remove('active');
+                    btn.classList.add('hover:bg-opacity-90');
                 }
             });
             renderGrid();
@@ -426,16 +482,16 @@
                     if (rowIndex === 0 && colIndex === 0) {
                         // Create the teams header cell
                         const eaglesDiv = document.createElement('div');
-                        eaglesDiv.innerHTML = '<span class="hidden md:inline">Eagles</span><span class="md:hidden">E</span> →';
-                        eaglesDiv.className = 'text-white text-sm font-medium';
+                        eaglesDiv.innerHTML = '<span class="hidden md:inline text-xs">Eagles</span><span class="md:hidden">E</span> →';
+                        eaglesDiv.className = 'text-white font-medium';
                         
                         const chiefsDiv = document.createElement('div');
-                        chiefsDiv.innerHTML = '↓ <span class="hidden md:inline">Chiefs</span><span class="md:hidden">C</span>';
-                        chiefsDiv.className = 'text-white text-sm font-medium mt-1';
+                        chiefsDiv.innerHTML = '↓ <span class="hidden md:inline text-xs">Chiefs</span><span class="md:hidden">C</span>';
+                        chiefsDiv.className = 'text-white font-medium mt-0.5';
                         
                         div.appendChild(eaglesDiv);
                         div.appendChild(chiefsDiv);
-                        div.className = 'header-cell aspect-square flex flex-col items-center justify-center p-2 text-sm transition-all shadow-sm';
+                        div.className = 'header-cell aspect-square flex flex-col items-center justify-center p-1 transition-all shadow-sm';
                     } else {
                         const name = document.createElement('div');
                         name.textContent = cell;
@@ -608,7 +664,7 @@
                                 <th class="px-1 md:px-4 py-1 md:py-2 text-center">Q3</th>
                                 <th class="px-1 md:px-4 py-1 md:py-2 text-center">Q4</th>
                                 <th class="hidden md:table-cell px-1 md:px-4 py-1 md:py-2 text-left">Best Square</th>
-                                <th class="px-1 md:px-4 py-1 md:py-2 text-center">Win%</th>
+                                <th class="px-1 md:px-4 py-1 md:py-2 text-center">Overall Chance</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -647,7 +703,7 @@
                     <p>* Percentages show the total probability of winning in each quarter based on all squares owned</p>
                     <p>* Best Square shows the single square with highest probability and in which quarter</p>
                     <p>* Green highlights indicate the quarter with the best chance of winning</p>
-                    <p>* Overall Chance shows the probability of winning at least one quarter (green >50%, blue >25%)</p>
+                    <p>* Overall Chance shows the probability of winning at least one quarter</p>
                 </div>
             `;
 
