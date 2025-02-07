@@ -505,18 +505,6 @@
                 }
             });
 
-            // Calculate normalization factors for each quarter
-            const normalizationFactors = {};
-            for (let quarter = 1; quarter <= 4; quarter++) {
-                let totalProb = 0;
-                for (let digit1 in quarterProbabilities[quarter]) {
-                    for (let digit2 in quarterProbabilities[quarter]) {
-                        totalProb += (quarterProbabilities[quarter][digit1] * quarterProbabilities[quarter][digit2]) / 100;
-                    }
-                }
-                normalizationFactors[quarter] = 100 / totalProb;
-            }
-
             // Calculate probabilities for each player
             for (let player in players) {
                 // Calculate probability for each quarter
@@ -525,12 +513,27 @@
                     let bestProb = 0;
                     let bestSquare = null;
                     
-                    players[player].squares.forEach(square => {
+                    // First calculate raw probabilities for all squares
+                    const squareProbs = players[player].squares.map(square => {
                         const chiefsProb = quarterProbabilities[quarter][square.chiefs];
                         const eaglesProb = quarterProbabilities[quarter][square.eagles];
-                        const rawProb = (chiefsProb * eaglesProb) / 100;
-                        // Normalize the probability
-                        const normalizedProb = rawProb * normalizationFactors[quarter];
+                        return {
+                            square: square,
+                            prob: (chiefsProb * eaglesProb) / 100
+                        };
+                    });
+                    
+                    // Calculate total probability for this quarter across all squares
+                    let totalQuarterProb = 0;
+                    for (let digit1 in quarterProbabilities[quarter]) {
+                        for (let digit2 in quarterProbabilities[quarter]) {
+                            totalQuarterProb += (quarterProbabilities[quarter][digit1] * quarterProbabilities[quarter][digit2]) / 100;
+                        }
+                    }
+                    
+                    // Normalize each square's probability and sum for the player
+                    squareProbs.forEach(({ square, prob }) => {
+                        const normalizedProb = (prob / totalQuarterProb) * 100;
                         quarterProb += normalizedProb;
                         
                         if (normalizedProb > bestProb) {
