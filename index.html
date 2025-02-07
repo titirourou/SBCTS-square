@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Bowl LVIII Squares</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nflBlue: '#013369',
+                        nflRed: '#D50A0A',
+                        prob1: '#f7fbff',  // Adjusted for better contrast
+                        prob2: '#deebf7',
+                        prob3: '#c6dbef',
+                        prob4: '#9ecae1',
+                        prob5: '#6baed6',
+                        prob6: '#3182bd',
+                        prob7: '#08519c'   // Adjusted for better contrast
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .header-cell {
+            background: linear-gradient(135deg, #013369, #1a4980);
+        }
+        .score-cell {
+            background: linear-gradient(135deg, #D50A0A, #ff1f1f);
+        }
+        .grid-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+        .team-name {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            font-weight: bold;
+            color: #013369;
+            font-size: clamp(0.875rem, 2vw, 1.5rem);
+            white-space: nowrap;
+            text-align: center;
+            padding: 0.5rem 0;
+        }
+        .mobile-controls {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 0.75rem;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+        }
+        @media (max-width: 768px) {
+            .mobile-controls {
+                display: block;
+            }
+            .desktop-controls {
+                display: none;
+            }
+            body {
+                padding-bottom: 7rem;
+            }
+            #squares-grid {
+                font-size: 0.75rem;
+                min-width: unset !important;
+                width: 100%;
+            }
+            .squares-wrapper {
+                padding: 0;
+                margin: 0;
+            }
+            #squares-grid .aspect-square {
+                aspect-ratio: 1/1;
+                min-height: unset;
+                padding: 0.25rem;
+            }
+            #squares-grid .font-medium {
+                font-size: 0.65rem;
+            }
+            #squares-grid .text-xs {
+                font-size: 0.55rem;
+                margin-top: 0.125rem;
+            }
+        }
+        @media (max-width: 640px) {
+            #squares-grid {
+                font-size: 0.65rem;
+            }
+            #squares-grid .font-medium {
+                font-size: 0.6rem;
+            }
+            #squares-grid .text-xs {
+                font-size: 0.5rem;
+            }
+            .mobile-controls {
+                padding: 0.5rem;
+            }
+            body {
+                padding-bottom: 6rem;
+            }
+        }
+        .squares-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 1rem;
+            margin: -1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-2 md:p-4 lg:p-8 pb-24 md:pb-8">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-4 md:mb-8" data-aos="fade-down">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-nflBlue mb-2">Super Bowl LVIII Squares</h1>
+            <p class="text-lg md:text-xl text-gray-600">Kansas City Chiefs vs Philadelphia Eagles</p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-3 md:p-6 lg:p-8" data-aos="fade-up">
+            <div class="desktop-controls mb-4 md:mb-6">
+                <div class="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-4">
+                    <div class="flex space-x-2 md:space-x-4">
+                        <button onclick="updateQuarter(1)" class="quarter-btn px-3 md:px-6 py-2 bg-nflBlue text-white rounded-lg hover:bg-opacity-90 transition-all active" data-quarter="1">Q1</button>
+                        <button onclick="updateQuarter(2)" class="quarter-btn px-3 md:px-6 py-2 bg-nflBlue text-white rounded-lg hover:bg-opacity-90 transition-all" data-quarter="2">Q2</button>
+                        <button onclick="updateQuarter(3)" class="quarter-btn px-3 md:px-6 py-2 bg-nflBlue text-white rounded-lg hover:bg-opacity-90 transition-all" data-quarter="3">Q3</button>
+                        <button onclick="updateQuarter(4)" class="quarter-btn px-3 md:px-6 py-2 bg-nflBlue text-white rounded-lg hover:bg-opacity-90 transition-all" data-quarter="4">Final</button>
+                    </div>
+                    <div class="w-full md:w-auto">
+                        <select id="nameFilter-desktop" onchange="filterByName(this.value)" class="w-full md:w-auto px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-nflBlue">
+                            <option value="">Show All Names</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="squares-wrapper">
+                <div id="squares-grid" class="grid grid-cols-11 gap-0 border-2 border-gray-200 rounded-lg overflow-hidden md:min-w-[600px]">
+                    <!-- Grid will be populated with JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Controls Overlay -->
+    <div class="mobile-controls">
+        <div class="flex flex-col space-y-2">
+            <div class="grid grid-cols-4 gap-1">
+                <button onclick="updateQuarter(1)" class="quarter-btn px-1 py-1.5 bg-nflBlue text-white rounded-lg hover:bg-opacity-90 transition-all active text-sm" data-quarter="1">Q1</button>
+                <button onclick="updateQuarter(2)" class="quarter-btn px-1 py-1.5 bg-nflBlue text-white rounded-lg hover:bg-opacity-90 transition-all text-sm" data-quarter="2">Q2</button>
+                <button onclick="updateQuarter(3)" class="quarter-btn px-1 py-1.5 bg-nflBlue text-white rounded-lg hover:bg-opacity-90 transition-all text-sm" data-quarter="3">Q3</button>
+                <button onclick="updateQuarter(4)" class="quarter-btn px-1 py-1.5 bg-nflBlue text-white rounded-lg hover:bg-opacity-90 transition-all text-sm" data-quarter="4">Final</button>
+            </div>
+            <select id="nameFilter-mobile" onchange="filterByName(this.value)" class="w-full px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-nflBlue text-sm">
+                <option value="">Show All Names</option>
+            </select>
+        </div>
+    </div>
+
+    <script>
+        const gridData = [
+            ['Teams', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+            ['0', 'Allie', 'Tom', 'Tyler', 'Justin', 'Julie', 'Joe', 'Chris', 'Taylor', 'Kyle', 'Ryan'],
+            ['1', 'Tom', 'Ryan', 'Kyle', 'Julie', 'Kyle', 'Allie', 'Jeremy', 'Kyle', 'Justin', 'Chris'],
+            ['2', 'Chris', 'Jeremy', 'Tyler', 'Julie', 'Kyle', 'Chris', 'Ryan', 'Taylor', 'Julie', 'Tyler'],
+            ['3', 'Kyle', 'Tony', 'Robert', 'Tom', 'Alex', 'Justin', 'Tyler', 'Tim', 'Chris', 'Robert'],
+            ['4', 'Justin', 'Kyle', 'Tim', 'Chris', 'Tom', 'Jeremy', 'Julie', 'Alex', 'John', 'Julie'],
+            ['5', 'Alex', 'Joe', 'Chris', 'Allie', 'Tyler', 'Ryan', 'Kyle', 'Jeremy', 'Julie', 'Ryan'],
+            ['6', 'Taylor', 'Julie', 'Chris', 'Ryan', 'Kyle', 'Allie', 'Justin', 'Tom', 'Allie', 'John'],
+            ['7', 'Julie', 'John', 'Tony', 'Taylor', 'Allie', 'Tim', 'John', 'Allie', 'Alex', 'Kyle'],
+            ['8', 'Allie', 'Taylor', 'Robert', 'Kyle', 'Tony', 'Justin', 'Taylor', 'Chris', 'Ryan', 'Julie'],
+            ['9', 'Kyle', 'Tyler', 'Julie', 'John', 'Tim', 'Kyle', 'Taylor', 'Joe', 'Jeremy', 'Chris']
+        ];
+
+        const quarterProbabilities = {
+            1: {
+                0: 46.6, 1: 0, 2: 0, 3: 22.4, 4: 6.0, 5: 0, 6: 1.7, 7: 20.7, 8: 0.9, 9: 1.7
+            },
+            2: {
+                0: 29.3, 1: 5.2, 2: 4.3, 3: 19.0, 4: 11.2, 5: 0.9, 6: 9.5, 7: 15.5, 8: 2.6, 9: 2.6
+            },
+            3: {
+                0: 19.8, 1: 6.9, 2: 2.6, 3: 12.9, 4: 10.3, 5: 3.4, 6: 11.2, 7: 20.7, 8: 5.2, 9: 6.9
+            },
+            4: {
+                0: 13.8, 1: 13.8, 2: 4.3, 3: 10.3, 4: 12.1, 5: 6.0, 6: 8.6, 7: 17.2, 8: 6.0, 9: 7.8
+            }
+        };
+
+        const quarterMaxProbs = {
+            1: 25,  // Adjusted for Q1's high probabilities
+            2: 20,  // Q2 has lower max probabilities
+            3: 15,  // Q3 even more distributed
+            4: 12   // Final scores most distributed
+        };
+
+        let currentQuarter = 1;
+        let selectedName = '';
+
+        // Get unique names and populate dropdown
+        function populateNameDropdown() {
+            const names = new Set();
+            gridData.forEach((row, rowIndex) => {
+                if (rowIndex > 0) {
+                    row.forEach((cell, colIndex) => {
+                        if (colIndex > 0) {
+                            names.add(cell);
+                        }
+                    });
+                }
+            });
+            
+            const desktopDropdown = document.getElementById('nameFilter-desktop');
+            const mobileDropdown = document.getElementById('nameFilter-mobile');
+            
+            [desktopDropdown, mobileDropdown].forEach(dropdown => {
+                Array.from(names).sort().forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    dropdown.appendChild(option);
+                });
+            });
+        }
+
+        function filterByName(name) {
+            selectedName = name;
+            renderGrid();
+        }
+
+        function getBackgroundColor(probability, quarter) {
+            // Find the maximum probability for the current quarter
+            const currentQuarterProbs = quarterProbabilities[quarter];
+            let maxQuarterProb = 0;
+            
+            // Calculate the actual maximum probability for this quarter
+            for (let digit1 in currentQuarterProbs) {
+                for (let digit2 in currentQuarterProbs) {
+                    const combinedProb = (currentQuarterProbs[digit1] * currentQuarterProbs[digit2]) / 100;
+                    maxQuarterProb = Math.max(maxQuarterProb, combinedProb);
+                }
+            }
+            
+            // Normalize the probability relative to this quarter's maximum
+            const normalizedProb = (probability / maxQuarterProb) * 100;
+            
+            if (normalizedProb > 85) return 'bg-prob7';
+            if (normalizedProb > 70) return 'bg-prob6';
+            if (normalizedProb > 55) return 'bg-prob5';
+            if (normalizedProb > 40) return 'bg-prob4';
+            if (normalizedProb > 25) return 'bg-prob3';
+            if (normalizedProb > 10) return 'bg-prob2';
+            return 'bg-prob1';
+        }
+
+        function getTextColor(bgColorClass) {
+            // Map background classes to their hex colors
+            const colorMap = {
+                'bg-prob1': '#f7fbff',
+                'bg-prob2': '#deebf7',
+                'bg-prob3': '#c6dbef',
+                'bg-prob4': '#9ecae1',
+                'bg-prob5': '#6baed6',
+                'bg-prob6': '#3182bd',
+                'bg-prob7': '#08519c'
+            };
+
+            const hexColor = colorMap[bgColorClass];
+            
+            // Convert hex to RGB
+            const r = parseInt(hexColor.slice(1, 3), 16);
+            const g = parseInt(hexColor.slice(3, 5), 16);
+            const b = parseInt(hexColor.slice(5, 7), 16);
+            
+            // Calculate relative luminance
+            const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            
+            // Return white for dark backgrounds, dark gray for light backgrounds
+            return luminance > 0.6 ? 'text-gray-800' : 'text-white';
+        }
+
+        function updateQuarter(quarter) {
+            currentQuarter = quarter;
+            // Update active state of buttons
+            document.querySelectorAll('.quarter-btn').forEach(btn => {
+                if (parseInt(btn.dataset.quarter) === quarter) {
+                    btn.classList.add('active', 'bg-opacity-75');
+                } else {
+                    btn.classList.remove('active', 'bg-opacity-75');
+                }
+            });
+            renderGrid();
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('squares-grid');
+            grid.innerHTML = '';
+
+            gridData.forEach((row, rowIndex) => {
+                row.forEach((cell, colIndex) => {
+                    const div = document.createElement('div');
+                    
+                    if (rowIndex === 0 && colIndex === 0) {
+                        // Create the teams header cell
+                        const eaglesDiv = document.createElement('div');
+                        eaglesDiv.innerHTML = '<span class="hidden md:inline">Eagles</span><span class="md:hidden">E</span> →';
+                        eaglesDiv.className = 'text-white text-sm font-medium';
+                        
+                        const chiefsDiv = document.createElement('div');
+                        chiefsDiv.innerHTML = '↓ <span class="hidden md:inline">Chiefs</span><span class="md:hidden">C</span>';
+                        chiefsDiv.className = 'text-white text-sm font-medium mt-1';
+                        
+                        div.appendChild(eaglesDiv);
+                        div.appendChild(chiefsDiv);
+                        div.className = 'header-cell aspect-square flex flex-col items-center justify-center p-2 text-sm transition-all shadow-sm';
+                    } else {
+                        const name = document.createElement('div');
+                        name.textContent = cell;
+                        
+                        if (colIndex === 0 && rowIndex > 0) {
+                            name.className = 'font-bold text-white';
+                        } else {
+                            name.className = 'font-medium';
+                        }
+                        
+                        div.appendChild(name);
+                        
+                        let classes = 'aspect-square flex flex-col items-center justify-center p-2 text-sm transition-all shadow-sm';
+                        
+                        if (rowIndex === 0) {
+                            classes += ' score-cell text-white font-bold flex items-center justify-center h-full p-0';
+                        } else if (colIndex === 0) {
+                            classes += ' score-cell text-white font-bold';
+                        } else if (rowIndex > 0 && colIndex > 0) {
+                            const rowProb = quarterProbabilities[currentQuarter][row[0]];
+                            const colProb = quarterProbabilities[currentQuarter][gridData[0][colIndex]];
+                            const combinedProb = (rowProb * colProb) / 100;
+                            
+                            const bgColorClass = getBackgroundColor(combinedProb, currentQuarter);
+                            classes += ' ' + bgColorClass;
+                            
+                            const textColorClass = getTextColor(bgColorClass);
+                            name.className = `font-medium ${textColorClass}`;
+                            
+                            const probDiv = document.createElement('div');
+                            probDiv.className = `text-xs ${textColorClass} mt-1 font-medium`;
+                            probDiv.textContent = `${combinedProb.toFixed(1)}%`;
+                            div.appendChild(probDiv);
+
+                            if (selectedName && cell !== selectedName) {
+                                classes += ' opacity-20';
+                            } else if (selectedName && cell === selectedName) {
+                                classes += ' ring-2 ring-nflBlue ring-offset-2';
+                            }
+                        }
+                        
+                        div.className = classes;
+                    }
+                    
+                    grid.appendChild(div);
+                });
+            });
+        }
+
+        function analyzePlayerProbabilities() {
+            // Get all unique names and initialize their data
+            const players = {};
+            gridData.forEach((row, rowIndex) => {
+                if (rowIndex > 0) {
+                    row.forEach((cell, colIndex) => {
+                        if (colIndex > 0) {
+                            if (!players[cell]) {
+                                players[cell] = {
+                                    squares: [],
+                                    quarterProbs: {1: 0, 2: 0, 3: 0, 4: 0},
+                                    totalSquares: 0,
+                                    bestSquares: []
+                                };
+                            }
+                            players[cell].squares.push({
+                                chiefs: row[0],
+                                eagles: gridData[0][colIndex]
+                            });
+                            players[cell].totalSquares++;
+                        }
+                    });
+                }
+            });
+
+            // Calculate probabilities for each player
+            for (let player in players) {
+                // Calculate probability for each quarter
+                for (let quarter = 1; quarter <= 4; quarter++) {
+                    let quarterProb = 0;
+                    let bestProb = 0;
+                    let bestSquare = null;
+                    
+                    players[player].squares.forEach(square => {
+                        const chiefsProb = quarterProbabilities[quarter][square.chiefs];
+                        const eaglesProb = quarterProbabilities[quarter][square.eagles];
+                        const squareProb = (chiefsProb * eaglesProb) / 100;
+                        quarterProb += squareProb;
+                        
+                        if (squareProb > bestProb) {
+                            bestProb = squareProb;
+                            bestSquare = square;
+                        }
+                    });
+                    
+                    players[player].quarterProbs[quarter] = quarterProb;
+                    players[player].bestSquares.push({
+                        quarter: quarter,
+                        prob: bestProb,
+                        chiefs: bestSquare.chiefs,
+                        eagles: bestSquare.eagles
+                    });
+                }
+
+                // Sort best squares by probability
+                players[player].bestSquares.sort((a, b) => b.prob - a.prob);
+            }
+
+            // Sort players by their best quarter probability
+            const sortedPlayers = Object.entries(players).sort((a, b) => {
+                const aMaxProb = Math.max(...Object.values(a[1].quarterProbs));
+                const bMaxProb = Math.max(...Object.values(b[1].quarterProbs));
+                return bMaxProb - aMaxProb;
+            });
+
+            // Create and display the analysis
+            const analysisDiv = document.createElement('div');
+            analysisDiv.className = 'mt-8 bg-white rounded-xl p-2 md:p-6 shadow-lg';
+            analysisDiv.innerHTML = `
+                <h2 class="text-lg md:text-xl font-bold text-nflBlue mb-2 md:mb-4">Player Analysis</h2>
+                <div class="overflow-x-auto -mx-2 md:mx-0">
+                    <table class="min-w-full table-auto text-xs md:text-base">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-1 md:px-4 py-1 md:py-2 text-left">Player</th>
+                                <th class="px-1 md:px-4 py-1 md:py-2 text-center">Sq</th>
+                                <th class="px-1 md:px-4 py-1 md:py-2 text-center">Q1</th>
+                                <th class="px-1 md:px-4 py-1 md:py-2 text-center">Q2</th>
+                                <th class="px-1 md:px-4 py-1 md:py-2 text-center">Q3</th>
+                                <th class="px-1 md:px-4 py-1 md:py-2 text-center">Q4</th>
+                                <th class="hidden md:table-cell px-1 md:px-4 py-1 md:py-2 text-left">Best Square</th>
+                                <th class="px-1 md:px-4 py-1 md:py-2 text-center">Win%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sortedPlayers.map(([name, data]) => {
+                                const bestSquare = data.bestSquares[0];
+                                const maxProb = Math.max(...Object.values(data.quarterProbs));
+                                
+                                let notWinningProb = 1;
+                                for (let quarter = 1; quarter <= 4; quarter++) {
+                                    notWinningProb *= (1 - data.quarterProbs[quarter]/100);
+                                }
+                                const overallChance = (1 - notWinningProb) * 100;
+                                
+                                return `
+                                    <tr class="border-t hover:bg-gray-50">
+                                        <td class="px-1 md:px-4 py-1 md:py-2 font-medium">${name}</td>
+                                        <td class="px-1 md:px-4 py-1 md:py-2 text-center">${data.totalSquares}</td>
+                                        <td class="px-1 md:px-4 py-1 md:py-2 text-center ${data.quarterProbs[1] === maxProb ? 'text-green-600 font-bold' : ''}">${(data.quarterProbs[1]).toFixed(1)}%</td>
+                                        <td class="px-1 md:px-4 py-1 md:py-2 text-center ${data.quarterProbs[2] === maxProb ? 'text-green-600 font-bold' : ''}">${(data.quarterProbs[2]).toFixed(1)}%</td>
+                                        <td class="px-1 md:px-4 py-1 md:py-2 text-center ${data.quarterProbs[3] === maxProb ? 'text-green-600 font-bold' : ''}">${(data.quarterProbs[3]).toFixed(1)}%</td>
+                                        <td class="px-1 md:px-4 py-1 md:py-2 text-center ${data.quarterProbs[4] === maxProb ? 'text-green-600 font-bold' : ''}">${(data.quarterProbs[4]).toFixed(1)}%</td>
+                                        <td class="hidden md:table-cell px-1 md:px-4 py-1 md:py-2 text-left">
+                                            <span class="text-xs md:text-sm">
+                                                Chiefs ${bestSquare.chiefs}, Eagles ${bestSquare.eagles} 
+                                                <span class="text-green-600 font-medium">(${bestSquare.prob.toFixed(1)}% in Q${bestSquare.quarter})</span>
+                                            </span>
+                                        </td>
+                                        <td class="px-1 md:px-4 py-1 md:py-2 text-center font-bold ${overallChance > 50 ? 'text-green-600' : overallChance > 25 ? 'text-blue-600' : ''}">${overallChance.toFixed(1)}%</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 text-xs md:text-sm text-gray-600 space-y-1 hidden md:block">
+                    <p>* Percentages show the total probability of winning in each quarter based on all squares owned</p>
+                    <p>* Best Square shows the single square with highest probability and in which quarter</p>
+                    <p>* Green highlights indicate the quarter with the best chance of winning</p>
+                    <p>* Overall Chance shows the probability of winning at least one quarter (green >50%, blue >25%)</p>
+                </div>
+            `;
+
+            // Add the analysis after the grid
+            document.getElementById('squares-grid').parentNode.parentNode.appendChild(analysisDiv);
+        }
+
+        // Initialize AOS, dropdown, and grid
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+        
+        populateNameDropdown();
+        renderGrid();
+        analyzePlayerProbabilities();
+    </script>
+</body>
+</html> 
