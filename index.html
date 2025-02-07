@@ -74,10 +74,13 @@
                 font-size: 0.75rem;
                 min-width: unset !important;
                 width: 100%;
+                transform: scale(0.95);
+                margin: -1rem;
             }
             .squares-wrapper {
                 padding: 0;
                 margin: 0;
+                overflow-x: hidden;
             }
             #squares-grid .aspect-square {
                 aspect-ratio: 1/1;
@@ -91,10 +94,15 @@
                 font-size: 0.55rem;
                 margin-top: 0.125rem;
             }
+            .analysis-wrapper {
+                margin-bottom: 8rem;
+            }
         }
         @media (max-width: 640px) {
             #squares-grid {
                 font-size: 0.65rem;
+                transform: scale(0.9);
+                margin: -2rem;
             }
             #squares-grid .font-medium {
                 font-size: 0.6rem;
@@ -104,9 +112,14 @@
             }
             .mobile-controls {
                 padding: 0.5rem;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(8px);
             }
             body {
                 padding-bottom: 6rem;
+            }
+            .analysis-wrapper {
+                margin-bottom: 7rem;
             }
         }
         .squares-wrapper {
@@ -436,7 +449,7 @@
 
             // Create and display the analysis
             const analysisDiv = document.createElement('div');
-            analysisDiv.className = 'mt-8 bg-white rounded-xl p-2 md:p-6 shadow-lg';
+            analysisDiv.className = 'mt-8 bg-white rounded-xl p-2 md:p-6 shadow-lg analysis-wrapper';
             analysisDiv.innerHTML = `
                 <h2 class="text-lg md:text-xl font-bold text-nflBlue mb-2 md:mb-4">Player Analysis</h2>
                 <div class="overflow-x-auto -mx-2 md:mx-0">
