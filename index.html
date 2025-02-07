@@ -70,13 +70,14 @@
             body {
                 padding-bottom: 7rem;
                 background: white;
+                padding: 0;
             }
             #squares-grid {
                 font-size: 0.75rem;
                 min-width: unset !important;
-                width: calc(100vw - 2rem) !important;
-                margin-left: 0;
-                margin-right: 0;
+                width: 100% !important;
+                margin: 0;
+                border-radius: 0;
             }
             .squares-wrapper {
                 padding: 0;
@@ -85,8 +86,9 @@
                 width: 100%;
             }
             .bg-white {
-                padding: 0.75rem !important;
+                padding: 0 !important;
                 background: white;
+                border-radius: 0;
             }
             #squares-grid .aspect-square {
                 aspect-ratio: 1/1;
@@ -99,56 +101,51 @@
                 justify-content: center;
                 align-items: center;
             }
-            #squares-grid .font-medium {
-                font-size: 0.65rem;
-                line-height: 1;
-                text-align: center;
+            .analysis-wrapper {
+                margin: 1rem 0 7rem 0 !important;
+                padding: 1rem !important;
             }
-            #squares-grid .text-xs {
-                font-size: 0.55rem;
-                margin-top: 0.125rem;
-                line-height: 1;
-                text-align: center;
-            }
-            .score-cell {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                text-align: center !important;
-                min-height: 2rem !important;
-            }
-            .score-cell > div {
-                width: 100% !important;
-                text-align: center !important;
+            .analysis-wrapper table {
+                margin: 0 !important;
             }
             #nameFilter-mobile {
-                padding-top: 0.75rem !important;
-                padding-bottom: 0.75rem !important;
+                padding: 1rem !important;
+                font-size: 1.1rem !important;
+                height: 3.5rem;
+            }
+            .mobile-controls {
+                padding: 0.75rem;
+            }
+            .mobile-controls .grid {
+                margin-bottom: 0.75rem;
+            }
+            .quarter-btn {
+                padding: 0.75rem 0 !important;
                 font-size: 1rem !important;
             }
         }
         @media (max-width: 640px) {
             #squares-grid {
                 font-size: 0.65rem;
-                width: calc(100vw - 1.5rem) !important;
+                width: 100% !important;
             }
             .squares-wrapper {
                 width: 100%;
             }
             .mobile-controls {
-                padding: 0.75rem;
+                padding: 0.75rem 0.75rem 1.5rem 0.75rem;
                 background: rgba(255, 255, 255, 0.95);
                 backdrop-filter: blur(8px);
             }
             body {
-                padding-bottom: 6rem;
+                padding: 0;
             }
             .analysis-wrapper {
-                margin-bottom: 7rem;
+                margin: 0.5rem 0 7rem 0 !important;
+                padding: 0.75rem !important;
             }
             .bg-white {
-                padding: 0.5rem 0.75rem !important;
-                background: white;
+                padding: 0 !important;
             }
         }
         .squares-wrapper {
