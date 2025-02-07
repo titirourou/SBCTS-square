@@ -69,19 +69,24 @@
             }
             body {
                 padding-bottom: 7rem;
+                background: white;
             }
             #squares-grid {
                 font-size: 0.75rem;
                 min-width: unset !important;
                 width: 100vw !important;
-                margin-left: -0.75rem;
-                margin-right: -0.75rem;
+                margin-left: -1rem;
+                margin-right: -1rem;
             }
             .squares-wrapper {
                 padding: 0;
-                margin: 0 -0.75rem;
+                margin: 0 -1rem;
                 overflow-x: hidden;
-                width: calc(100% + 1.5rem);
+                width: calc(100% + 2rem);
+            }
+            .bg-white {
+                padding: 0.75rem 1rem !important;
+                background: white;
             }
             #squares-grid .aspect-square {
                 aspect-ratio: 1/1;
@@ -116,19 +121,16 @@
                 width: 100% !important;
                 text-align: center !important;
             }
-            .bg-white {
-                padding: 0.75rem !important;
-            }
         }
         @media (max-width: 640px) {
             #squares-grid {
                 font-size: 0.65rem;
-                margin-left: -0.5rem;
-                margin-right: -0.5rem;
+                margin-left: -0.75rem;
+                margin-right: -0.75rem;
             }
             .squares-wrapper {
-                margin: 0 -0.5rem;
-                width: calc(100% + 1rem);
+                margin: 0 -0.75rem;
+                width: calc(100% + 1.5rem);
             }
             #squares-grid .font-medium {
                 font-size: 0.6rem;
@@ -148,7 +150,8 @@
                 margin-bottom: 7rem;
             }
             .bg-white {
-                padding: 0.5rem !important;
+                padding: 0.5rem 0.75rem !important;
+                background: white;
             }
         }
         .squares-wrapper {
@@ -161,7 +164,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-2 md:p-4 lg:p-8 pb-24 md:pb-8">
+<body class="bg-white min-h-screen p-2 md:p-4 lg:p-8 pb-24 md:pb-8">
     <div class="max-w-7xl mx-auto">
         <div class="text-center mb-4 md:mb-8" data-aos="fade-down">
             <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-nflBlue mb-2">Super Bowl LVIII Squares</h1>
