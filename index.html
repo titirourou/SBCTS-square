@@ -73,15 +73,15 @@
             #squares-grid {
                 font-size: 0.75rem;
                 min-width: unset !important;
-                width: 100%;
-                transform: none;
-                margin: 0;
+                width: 100vw !important;
+                margin-left: -0.75rem;
+                margin-right: -0.75rem;
             }
             .squares-wrapper {
                 padding: 0;
-                margin: 0;
+                margin: 0 -0.75rem;
                 overflow-x: hidden;
-                width: 100%;
+                width: calc(100% + 1.5rem);
             }
             #squares-grid .aspect-square {
                 aspect-ratio: 1/1;
@@ -89,28 +89,46 @@
                 padding: 0.25rem;
                 width: 100%;
                 height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
             }
             #squares-grid .font-medium {
                 font-size: 0.65rem;
                 line-height: 1;
+                text-align: center;
             }
             #squares-grid .text-xs {
                 font-size: 0.55rem;
                 margin-top: 0.125rem;
                 line-height: 1;
+                text-align: center;
             }
-            .analysis-wrapper {
-                margin-bottom: 8rem;
+            .score-cell {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                text-align: center !important;
+                min-height: 2rem !important;
+            }
+            .score-cell > div {
+                width: 100% !important;
+                text-align: center !important;
             }
             .bg-white {
-                padding: 0.5rem !important;
+                padding: 0.75rem !important;
             }
         }
         @media (max-width: 640px) {
             #squares-grid {
                 font-size: 0.65rem;
-                transform: none;
-                margin: 0;
+                margin-left: -0.5rem;
+                margin-right: -0.5rem;
+            }
+            .squares-wrapper {
+                margin: 0 -0.5rem;
+                width: calc(100% + 1rem);
             }
             #squares-grid .font-medium {
                 font-size: 0.6rem;
@@ -130,7 +148,7 @@
                 margin-bottom: 7rem;
             }
             .bg-white {
-                padding: 0 !important;
+                padding: 0.5rem !important;
             }
         }
         .squares-wrapper {
