@@ -74,35 +74,43 @@
                 font-size: 0.75rem;
                 min-width: unset !important;
                 width: 100%;
-                transform: scale(0.95);
-                margin: -1rem;
+                transform: none;
+                margin: 0;
             }
             .squares-wrapper {
                 padding: 0;
                 margin: 0;
                 overflow-x: hidden;
+                width: 100%;
             }
             #squares-grid .aspect-square {
                 aspect-ratio: 1/1;
                 min-height: unset;
                 padding: 0.25rem;
+                width: 100%;
+                height: 100%;
             }
             #squares-grid .font-medium {
                 font-size: 0.65rem;
+                line-height: 1;
             }
             #squares-grid .text-xs {
                 font-size: 0.55rem;
                 margin-top: 0.125rem;
+                line-height: 1;
             }
             .analysis-wrapper {
                 margin-bottom: 8rem;
+            }
+            .bg-white {
+                padding: 0.5rem !important;
             }
         }
         @media (max-width: 640px) {
             #squares-grid {
                 font-size: 0.65rem;
-                transform: scale(0.9);
-                margin: -2rem;
+                transform: none;
+                margin: 0;
             }
             #squares-grid .font-medium {
                 font-size: 0.6rem;
@@ -121,12 +129,17 @@
             .analysis-wrapper {
                 margin-bottom: 7rem;
             }
+            .bg-white {
+                padding: 0 !important;
+            }
         }
         .squares-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            padding: 1rem;
-            margin: -1rem;
+            width: 100%;
+        }
+        #squares-grid {
+            grid-template-columns: repeat(11, minmax(0, 1fr));
         }
     </style>
 </head>
@@ -155,7 +168,7 @@
             </div>
             
             <div class="squares-wrapper">
-                <div id="squares-grid" class="grid grid-cols-11 gap-0 border-2 border-gray-200 rounded-lg overflow-hidden md:min-w-[600px]">
+                <div id="squares-grid" class="grid grid-cols-11 gap-0 border-2 border-gray-200 rounded-lg overflow-hidden w-full">
                     <!-- Grid will be populated with JavaScript -->
                 </div>
             </div>
