@@ -518,24 +518,15 @@
                     let bestProb = 0;
                     let bestSquare = null;
                     
-                    // Calculate total probability for this quarter across all squares
-                    let totalQuarterProb = 0;
-                    for (let digit1 in quarterProbabilities[quarter]) {
-                        for (let digit2 in quarterProbabilities[quarter]) {
-                            totalQuarterProb += (quarterProbabilities[quarter][digit1] * quarterProbabilities[quarter][digit2]) / 100;
-                        }
-                    }
-                    
                     // Calculate raw probabilities for each square
                     players[player].squares.forEach(square => {
                         const chiefsProb = quarterProbabilities[quarter][square.chiefs];
                         const eaglesProb = quarterProbabilities[quarter][square.eagles];
                         const rawProb = (chiefsProb * eaglesProb) / 100;
-                        const normalizedProb = (rawProb / totalQuarterProb) * 100;
-                        quarterProb += normalizedProb;
+                        quarterProb += rawProb;
                         
-                        if (normalizedProb > bestProb) {
-                            bestProb = normalizedProb;
+                        if (rawProb > bestProb) {
+                            bestProb = rawProb;
                             bestSquare = square;
                         }
                     });
@@ -559,9 +550,38 @@
                 for (let player in players) {
                     totalProb += players[player].quarterProbs[quarter];
                 }
-                // Adjust probabilities to sum to 100%
+                
+                // First normalize all probabilities except the highest one
+                let remainingProb = 100;
+                let highestProb = 0;
+                let playerWithHighestProb = null;
+                
                 for (let player in players) {
-                    players[player].quarterProbs[quarter] = (players[player].quarterProbs[quarter] / totalProb) * 100;
+                    const normalizedProb = (players[player].quarterProbs[quarter] / totalProb) * 100;
+                    if (normalizedProb > highestProb) {
+                        highestProb = normalizedProb;
+                        playerWithHighestProb = player;
+                    }
+                }
+                
+                // Normalize all except the highest
+                for (let player in players) {
+                    if (player !== playerWithHighestProb) {
+                        const normalizedProb = (players[player].quarterProbs[quarter] / totalProb) * 100;
+                        players[player].quarterProbs[quarter] = normalizedProb;
+                        remainingProb -= normalizedProb;
+                    }
+                }
+                
+                // Assign the remaining probability to the highest probability player
+                players[playerWithHighestProb].quarterProbs[quarter] = remainingProb;
+                
+                // Normalize best square probabilities
+                for (let player in players) {
+                    const bestSquareForQuarter = players[player].bestSquares.find(s => s.quarter === quarter);
+                    if (bestSquareForQuarter) {
+                        bestSquareForQuarter.prob = (bestSquareForQuarter.prob / totalProb) * 100;
+                    }
                 }
             }
 
@@ -613,7 +633,7 @@
                                         <td class="hidden md:table-cell px-1 md:px-4 py-1 md:py-2 text-left">
                                             <span class="text-xs md:text-sm">
                                                 Chiefs ${bestSquare.chiefs}, Eagles ${bestSquare.eagles} 
-                                                <span class="text-green-600 font-medium">(${bestSquare.prob.toFixed(1)}% in Q${bestSquare.quarter})</span>
+                                                <span class="text-green-600 font-medium">(${(bestSquare.prob).toFixed(1)}% in Q${bestSquare.quarter})</span>
                                             </span>
                                         </td>
                                         <td class="px-1 md:px-4 py-1 md:py-2 text-center font-bold ${overallChance > 50 ? 'text-green-600' : overallChance > 25 ? 'text-blue-600' : ''}">${overallChance.toFixed(1)}%</td>
