@@ -401,12 +401,24 @@
 
             // Calculate total probability for current quarter
             let totalQuarterProb = 0;
-            for (let digit1 in quarterProbabilities[currentQuarter]) {
-                for (let digit2 in quarterProbabilities[currentQuarter]) {
-                    totalQuarterProb += (quarterProbabilities[currentQuarter][digit1] * quarterProbabilities[currentQuarter][digit2]) / 100;
+            const gridProbs = [];
+            
+            // First calculate all raw probabilities
+            gridData.forEach((row, rowIndex) => {
+                if (rowIndex > 0) {
+                    row.forEach((cell, colIndex) => {
+                        if (colIndex > 0) {
+                            const rowProb = quarterProbabilities[currentQuarter][row[0]];
+                            const colProb = quarterProbabilities[currentQuarter][gridData[0][colIndex]];
+                            const rawProb = (rowProb * colProb) / 100;
+                            totalQuarterProb += rawProb;
+                            gridProbs.push({ rowIndex, colIndex, rawProb });
+                        }
+                    });
                 }
-            }
+            });
 
+            // Now render grid with normalized probabilities
             gridData.forEach((row, rowIndex) => {
                 row.forEach((cell, colIndex) => {
                     const div = document.createElement('div');
@@ -444,10 +456,8 @@
                         } else if (colIndex === 0) {
                             classes += ' score-cell text-white font-bold h-full flex items-center justify-center p-0';
                         } else if (rowIndex > 0 && colIndex > 0) {
-                            const rowProb = quarterProbabilities[currentQuarter][row[0]];
-                            const colProb = quarterProbabilities[currentQuarter][gridData[0][colIndex]];
-                            const rawProb = (rowProb * colProb) / 100;
-                            const normalizedProb = (rawProb / totalQuarterProb) * 100;
+                            const gridProb = gridProbs.find(p => p.rowIndex === rowIndex && p.colIndex === colIndex);
+                            const normalizedProb = (gridProb.rawProb / totalQuarterProb) * 100;
                             
                             const bgColorClass = getBackgroundColor(normalizedProb, currentQuarter);
                             classes += ' ' + bgColorClass;
@@ -516,7 +526,7 @@
                         }
                     }
                     
-                    // Calculate probabilities for each square
+                    // Calculate raw probabilities for each square
                     players[player].squares.forEach(square => {
                         const chiefsProb = quarterProbabilities[quarter][square.chiefs];
                         const eaglesProb = quarterProbabilities[quarter][square.eagles];
@@ -541,6 +551,18 @@
 
                 // Sort best squares by probability
                 players[player].bestSquares.sort((a, b) => b.prob - a.prob);
+            }
+
+            // Normalize probabilities across all players for each quarter
+            for (let quarter = 1; quarter <= 4; quarter++) {
+                let totalProb = 0;
+                for (let player in players) {
+                    totalProb += players[player].quarterProbs[quarter];
+                }
+                // Adjust probabilities to sum to 100%
+                for (let player in players) {
+                    players[player].quarterProbs[quarter] = (players[player].quarterProbs[quarter] / totalProb) * 100;
+                }
             }
 
             // Sort players by their best quarter probability
